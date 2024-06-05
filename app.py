@@ -51,7 +51,7 @@ def detect_and_predict(frame):
     return frame
 
 def generate_frames():
-    video = cv2.VideoCapture(0)
+    video = cv2.VideoCapture(1)
     if not video.isOpened():
         print("Error: Could not open video source.")
         return
