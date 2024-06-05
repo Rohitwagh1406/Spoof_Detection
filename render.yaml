@@ -1,0 +1,14 @@
+services:
+  - name: web
+    env:
+      - key: PORT
+        value: 5000
+      - key: FACE_CASCADE_PATH
+        value: "models/haarcascade_frontalface_default.xml"
+      - key: MODEL_JSON_PATH
+        value: "antispoofing_models/antispoofing_model.json"
+      - key: MODEL_WEIGHTS_PATH
+        value: "antispoofing_models/antispoofing_model.h5"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    healthCheckPath: /
