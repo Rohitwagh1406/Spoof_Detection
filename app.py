@@ -10,14 +10,17 @@ app = Flask(__name__)
 port = int(os.environ.get("PORT", 5000))
 
 # Load Face Detection Model
-face_cascade_path = os.environ.get("FACE_CASCADE_PATH")
+# face_cascade_path = os.environ.get("FACE_CASCADE_PATH")
+face_cascade_path = r"models/haarcascade_frontalface_default.xml"
 face_cascade = cv2.CascadeClassifier(face_cascade_path)
 if face_cascade.empty():
     print(f"Error loading face cascade from {face_cascade_path}")
 
 # Load Anti-Spoofing Model
-model_json_path = os.environ.get("MODEL_JSON_PATH")
-model_weights_path = os.environ.get("MODEL_WEIGHTS_PATH")
+# model_json_path = os.environ.get("MODEL_JSON_PATH")
+# model_weights_path = os.environ.get("MODEL_WEIGHTS_PATH")
+model_json_path = r'antispoofing_models\antispoofing_model.json'
+model_weights_path = r'antispoofing_models\antispoofing_model.h5'
 
 with open(model_json_path, 'r') as json_file:
     loaded_model_json = json_file.read()
