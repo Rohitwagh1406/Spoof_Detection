@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 from keras.models import model_from_json
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 port = int(os.environ.get("PORT", 5000))
