@@ -89,8 +89,7 @@ def video_feed():
     processed_frame = detect_and_predict(img)
     _, buffer = cv2.imencode('.jpg', processed_frame)
     io_buf = BytesIO(buffer)
-
-     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
     # app.run(debug=True)
