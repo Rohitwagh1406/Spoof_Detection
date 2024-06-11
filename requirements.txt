@@ -1,9 +1,9 @@
 # git+https://github.com/python/peps/blob/main/peps/pep-0619.rst
 Flask==3.0.3
-# keras==2.15.0
+keras==2.15.0
 numpy==1.26.4
 opencv_python==4.10.0.82
-tensorflow
+# tensorflow
 # tensorflow_intel==2.15.0
 # Pillow==9.5.0
 Pillow==10.3.0
