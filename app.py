@@ -22,7 +22,7 @@ model_weights_path = r'antispoofing_models/antispoofing_model.h5'
 with open(model_json_path, 'r') as json_file:
     loaded_model_json = json_file.read()
 
-model = keras.model_from_json(loaded_model_json)
+model = model_from_json(loaded_model_json)
 model.load_weights(model_weights_path)
 print("Model loaded from disk")
 
