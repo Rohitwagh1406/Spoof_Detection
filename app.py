@@ -5,10 +5,10 @@ from keras.models import model_from_json
 import os
 from io import BytesIO
 from PIL import Image
-
+from flask_cors import CORS
 app = Flask(__name__)
 port = int(os.environ.get("PORT", 5000))
-
+CORS(app)
 # Load Face Detection Model
 face_cascade_path = r"models/haarcascade_frontalface_default.xml"
 face_cascade = cv2.CascadeClassifier(face_cascade_path)
