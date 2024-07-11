@@ -89,6 +89,10 @@ def video_feed():
     processed_frame = detect_and_predict(img)
     _, buffer = cv2.imencode('.jpg', processed_frame)
     io_buf = BytesIO(buffer)
+
+    del frame
+
+    
     return send_file(io_buf, mimetype='image/jpeg')
 
 if __name__ == "__main__":
