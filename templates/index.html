@@ -20,6 +20,100 @@
         const video = document.getElementById('video');
         const snapshot = document.getElementById('snapshot');
         
+        async function init() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                await startSendingFrames();
+            } catch (err) {
+                console.error("Error accessing webcam or starting frame sending: ", err);
+            }
+        }
+
+        // Function to send frames to the backend
+        async function startSendingFrames() {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            function captureFrame() {
+                return new Promise((resolve, reject) => {
+                    if (video.paused || video.ended) {
+                        reject('Video stream paused or ended');
+                    }
+
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob(blob => {
+                        if (!blob) {
+                            reject('Failed to capture frame as blob');
+                        }
+                        resolve(blob);
+                    }, 'image/jpeg');
+                });
+            }
+
+            async function sendFrame() {
+                try {
+                    const blob = await captureFrame();
+                    const formData = new FormData();
+                    formData.append('frame', blob, 'frame.jpg');
+
+                    const response = await fetch('/video_feed', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to receive image from server');
+                    }
+
+                    const processedBlob = await response.blob();
+                    const url = URL.createObjectURL(processedBlob);
+                    snapshot.src = url;
+                } catch (err) {
+                    console.error('Error sending or receiving frame:', err);
+                } finally {
+                    setTimeout(sendFrame, 100); // Capture a frame every 100ms
+                }
+            }
+
+            await sendFrame(); // Start sending frames
+        }
+
+        // Initialize the application
+        init().catch(err => console.error('Error initializing application:', err));
+    </script>
+</body>
+</html>
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebCam Access</title>
+    <style>
+        video, img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebCam Feed</h1>
+    <video id="video" autoplay></video>
+    <img id="snapshot" alt="Captured Frame">
+    <script>
+        // Access the webcam
+        const video = document.getElementById('video');
+        const snapshot = document.getElementById('snapshot');
+        
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
@@ -64,41 +158,5 @@
             sendFrame();
         });
     </script>
-</body>
-</html>
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Face Anti-Spoofing</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #F0F0F0;
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .container {
-            text-align: center;
-        }
-        video {
-            border: 5px solid #333;
-            border-radius: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Real-Time Face Anti-Spoofing</h1>
-        <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Video feed not available">
-    </div>
 </body>
 </html> -->
