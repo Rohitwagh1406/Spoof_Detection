@@ -45,7 +45,9 @@ def detect_and_predict(frame):
         cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
 
-    return frame
+    #return frame
+    return label
+
 
 def generate_frames():
     video = cv2.VideoCapture(0)
