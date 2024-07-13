@@ -43,8 +43,8 @@ def detect_and_predict(frame):
         cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
 
-    # return frame
-    return label
+    return frame
+    # return label
     
 
 
@@ -88,13 +88,13 @@ def video_feed():
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
     processed_frame = detect_and_predict(img)
-    # _, buffer = cv2.imencode('.jpg', processed_frame)
-    # io_buf = BytesIO(buffer)
+    _, buffer = cv2.imencode('.jpg', processed_frame)
+    io_buf = BytesIO(buffer)
 
     del frame
 
-    return processed_frame
-    # return send_file(io_buf, mimetype='image/jpeg')
+    # return processed_frame
+    return send_file(io_buf, mimetype='image/jpeg')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
