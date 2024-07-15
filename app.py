@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, send_file
+from flask import Flask, render_template, Response, request, send_file, jsonify
 import cv2
 import numpy as np
 from keras.models import model_from_json
