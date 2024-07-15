@@ -38,13 +38,13 @@ def detect_and_predict(frame):
         print(f"Predictions: {preds}")  # Debug: Print predictions
 
         label = 'real' if preds <= 0.5 else 'spoof'
-    #     color = (0, 255, 0) if preds <= 0.5 else (0, 0, 255)
+        color = (0, 255, 0) if preds <= 0.5 else (0, 0, 255)
 
-    #     cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-    #     cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+        cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
 
-    # return frame
-    return label
+    return frame
+    # return label
     
 
 
@@ -76,7 +76,7 @@ def generate_frames():
 
 @app.route('/')
 def index():
-    return render_template('index3.html')
+    return render_template('index.html')
 
 @app.route('/video_feed', methods=['POST'])
 def video_feed():
@@ -87,15 +87,15 @@ def video_feed():
     npimg = np.frombuffer(frame, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    # processed_frame = detect_and_predict(img)
-    label = detect_and_predict(img)
-    # _, buffer = cv2.imencode('.jpg', processed_frame)
-    # io_buf = BytesIO(buffer)
+    processed_frame = detect_and_predict(img)
+    # label = detect_and_predict(img)
+    _, buffer = cv2.imencode('.jpg', processed_frame)
+    io_buf = BytesIO(buffer)
 
     del frame
-    return label
+    # return label
     # return processed_frame
-    # return send_file(io_buf, mimetype='image/jpeg')
+    return send_file(io_buf, mimetype='image/jpeg')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
