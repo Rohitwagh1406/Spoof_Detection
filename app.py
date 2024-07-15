@@ -24,30 +24,47 @@ model = model_from_json(loaded_model_json)
 model.load_weights(model_weights_path)
 print("Model loaded from disk")
 
+# def detect_and_predict(frame):
+#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+
+#     for (x, y, w, h) in faces:
+#         face = frame[y - 5:y + h + 5, x - 5:x + w + 5]
+#         resized_face = cv2.resize(face, (160, 160))
+#         resized_face = resized_face.astype("float") / 255.0
+#         resized_face = np.expand_dims(resized_face, axis=0)
+
+#         preds = model.predict(resized_face)[0]
+#         print(f"Predictions: {preds}")  # Debug: Print predictions
+
+#         label = 'real' if preds <= 0.5 else 'spoof'
+#         color = (0, 255, 0) if preds <= 0.5 else (0, 0, 255)
+
+#         cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+#         cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+
+#     return frame
+#     # return label
+    
+###
 def detect_and_predict(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    predictions = []
 
     for (x, y, w, h) in faces:
         face = frame[y - 5:y + h + 5, x - 5:x + w + 5]
         resized_face = cv2.resize(face, (160, 160))
         resized_face = resized_face.astype("float") / 255.0
         resized_face = np.expand_dims(resized_face, axis=0)
-
         preds = model.predict(resized_face)[0]
-        print(f"Predictions: {preds}")  # Debug: Print predictions
-
         label = 'real' if preds <= 0.5 else 'spoof'
-        color = (0, 255, 0) if preds <= 0.5 else (0, 0, 255)
-
-        cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-
-    return frame
-    # return label
-    
-
-
+        predictions.append({
+            "label": label,
+            "confidence": float(preds)
+        })
+    return predictions
+###
 def generate_frames():
     video = cv2.VideoCapture(0)
     if not video.isOpened():
@@ -78,24 +95,37 @@ def generate_frames():
 def index():
     return render_template('index.html')
 
-@app.route('/video_feed', methods=['POST'])
-def video_feed():
+# @app.route('/video_feed', methods=['POST'])
+# def video_feed():
+#     if 'frame' not in request.files:
+#         return "No frame found", 400
+
+#     frame = request.files['frame'].read()
+#     npimg = np.frombuffer(frame, np.uint8)
+#     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+
+#     processed_frame = detect_and_predict(img)
+#     # label = detect_and_predict(img)
+#     _, buffer = cv2.imencode('.jpg', processed_frame)
+#     io_buf = BytesIO(buffer)
+
+#     del frame
+#     # return label
+#     # return processed_frame
+#     return send_file(io_buf, mimetype='image/jpeg')
+
+@app.route('/predict', methods=["POST"])
+def predict():
     if 'frame' not in request.files:
-        return "No frame found", 400
+        return jsonify({"error": "No image data found"}), 400
 
-    frame = request.files['frame'].read()
-    npimg = np.frombuffer(frame, np.uint8)
-    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+    file = request.files['frame']
+    image_data = file.read()
+    np_arr = np.frombuffer(image_data, np.uint8)
+    frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-    processed_frame = detect_and_predict(img)
-    # label = detect_and_predict(img)
-    _, buffer = cv2.imencode('.jpg', processed_frame)
-    io_buf = BytesIO(buffer)
-
-    del frame
-    # return label
-    # return processed_frame
-    return send_file(io_buf, mimetype='image/jpeg')
+    predictions = detect_and_predict(frame)
+    return jsonify(predictions)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
