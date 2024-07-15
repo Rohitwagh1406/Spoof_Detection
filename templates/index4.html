@@ -70,7 +70,7 @@
                     }
 
                     const label = await response.text();
-                    processLabel(label); // Call function to process the label
+                    resultDiv.textContent = `Prediction: ${label}`;
                 } catch (err) {
                     console.error('Error sending or receiving frame:', err);
                 } finally {
@@ -79,12 +79,6 @@
             }
 
             await sendFrame(); // Start sending frames
-        }
-
-        // Function to process the label and update UI
-        function processLabel(label) {
-            resultDiv.textContent = `Prediction: ${label}`;
-            // You can add further logic here if needed
         }
 
         // Initialize the application
