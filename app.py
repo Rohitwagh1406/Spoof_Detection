@@ -76,7 +76,7 @@ def generate_frames():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index3.html')
 
 @app.route('/video_feed', methods=['POST'])
 def video_feed():
