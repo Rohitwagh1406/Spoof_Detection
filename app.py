@@ -111,7 +111,7 @@ def index():
 #     # return processed_frame
 #     return send_file(io_buf, mimetype='image/jpeg')
 
-@app.route('/predict', methods=["POST"])
+@app.route('/video_feed', methods=["POST"])
 def predict():
     if 'frame' not in request.files:
         return jsonify({"error": "No image data found"}), 400
