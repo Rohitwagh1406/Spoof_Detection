@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebCam Access</title>
     <style>
-        video {
+        video, img {
             max-width: 100%;
             height: auto;
         }
@@ -14,11 +14,11 @@
 <body>
     <h1>WebCam Feed</h1>
     <video id="video" autoplay></video>
-    <div id="label"></div>
-
+    <div id="result"></div>
     <script>
+        // Access the webcam
         const video = document.getElementById('video');
-        const labelDiv = document.getElementById('label');
+        const resultDiv = document.getElementById('result');
 
         async function init() {
             try {
@@ -30,6 +30,7 @@
             }
         }
 
+        // Function to send frames to the backend
         async function startSendingFrames() {
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -65,11 +66,11 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error('Server returned ' + response.status + ' ' + response.statusText);
+                        throw new Error('Failed to receive label from server');
                     }
 
                     const label = await response.text();
-                    labelDiv.textContent = `Prediction: ${label}`;
+                    processLabel(label); // Call function to process the label
                 } catch (err) {
                     console.error('Error sending or receiving frame:', err);
                 } finally {
@@ -80,8 +81,14 @@
             await sendFrame(); // Start sending frames
         }
 
+        // Function to process the label and update UI
+        function processLabel(label) {
+            resultDiv.textContent = `Prediction: ${label}`;
+            // You can add further logic here if needed
+        }
+
+        // Initialize the application
         init().catch(err => console.error('Error initializing application:', err));
     </script>
 </body>
 </html>
-
