@@ -59,10 +59,7 @@ def detect_and_predict(frame):
         resized_face = np.expand_dims(resized_face, axis=0)
         preds = model.predict(resized_face)[0]
         label = 'real' if preds <= 0.5 else 'spoof'
-        predictions.append({
-            "label": label,
-            "confidence": float(preds)
-        })
+        predictions.append(label)
     return predictions
 ###
 def generate_frames():
