@@ -120,12 +120,12 @@ def video_feed():
     npimg = np.frombuffer(frame, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    predictions = detect_and_predict(img)
+    processed_frame = detect_and_predict(img)
     # label = detect_and_predict(img)
     _, buffer = cv2.imencode('.jpg', processed_frame)
     io_buf = BytesIO(buffer)
     del frame
-    return jsonify(predictions)
+    return jsonify(processed_frame)
 ###
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
