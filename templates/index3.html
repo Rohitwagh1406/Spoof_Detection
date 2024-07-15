@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebCam Access</title>
     <style>
-        video {
+        video, img {
             max-width: 100%;
             height: auto;
         }
@@ -14,11 +14,12 @@
 <body>
     <h1>WebCam Feed</h1>
     <video id="video" autoplay></video>
-    <div id="label"></div>
+    <div id="predictions"></div>
 
     <script>
+        // Access the webcam
         const video = document.getElementById('video');
-        const labelDiv = document.getElementById('label');
+        const predictionsDiv = document.getElementById('predictions');
 
         async function init() {
             try {
@@ -30,6 +31,7 @@
             }
         }
 
+        // Function to send frames to the backend
         async function startSendingFrames() {
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -59,17 +61,17 @@
                     const formData = new FormData();
                     formData.append('frame', blob, 'frame.jpg');
 
-                    const response = await fetch('/video_feed', {
+                    const response = await fetch('/predict', {
                         method: 'POST',
                         body: formData
                     });
 
                     if (!response.ok) {
-                        throw new Error('Failed to receive label from server');
+                        throw new Error('Failed to receive predictions from server');
                     }
 
-                    const label = await response.text();
-                    labelDiv.textContent = `Prediction: ${label}`;
+                    const predictions = await response.json();
+                    displayPredictions(predictions);
                 } catch (err) {
                     console.error('Error sending or receiving frame:', err);
                 } finally {
@@ -80,6 +82,20 @@
             await sendFrame(); // Start sending frames
         }
 
+        // Function to display predictions on the frontend
+        function displayPredictions(predictions) {
+            predictionsDiv.innerHTML = ''; // Clear previous predictions
+            predictions.forEach(prediction => {
+                const label = prediction.label;
+                const confidence = prediction.confidence.toFixed(4); // Adjust precision as needed
+                const predictionText = `Label: ${label}, Confidence: ${confidence}`;
+                const predictionElement = document.createElement('p');
+                predictionElement.textContent = predictionText;
+                predictionsDiv.appendChild(predictionElement);
+            });
+        }
+
+        // Initialize the application
         init().catch(err => console.error('Error initializing application:', err));
     </script>
 </body>
