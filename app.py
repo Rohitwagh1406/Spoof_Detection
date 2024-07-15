@@ -110,19 +110,22 @@ def index():
 #     # return label
 #     # return processed_frame
 #     return send_file(io_buf, mimetype='image/jpeg')
-
+###
 @app.route('/video_feed', methods=["POST"])
-def predict():
+def video_feed():
     if 'frame' not in request.files:
-        return jsonify({"error": "No image data found"}), 400
+        return "No frame found", 400
 
-    file = request.files['frame']
-    image_data = file.read()
-    np_arr = np.frombuffer(image_data, np.uint8)
-    frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    frame = request.files['frame'].read()
+    npimg = np.frombuffer(frame, np.uint8)
+    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    predictions = detect_and_predict(frame)
+    predictions = detect_and_predict(img)
+    # label = detect_and_predict(img)
+    _, buffer = cv2.imencode('.jpg', processed_frame)
+    io_buf = BytesIO(buffer)
+    del frame
     return jsonify(predictions)
-
+###
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
