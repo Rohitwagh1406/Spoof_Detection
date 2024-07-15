@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebCam Access</title>
     <style>
-        video, img {
+        video {
             max-width: 100%;
             height: auto;
         }
@@ -14,13 +14,12 @@
 <body>
     <h1>WebCam Feed</h1>
     <video id="video" autoplay></video>
-    <div id="predictions"></div>
-
+    <div id="prediction"></div>
     <script>
         // Access the webcam
         const video = document.getElementById('video');
-        const predictionsDiv = document.getElementById('predictions');
-
+        const predictionDiv = document.getElementById('prediction');
+        
         async function init() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -61,7 +60,7 @@
                     const formData = new FormData();
                     formData.append('frame', blob, 'frame.jpg');
 
-                    const response = await fetch('/predict', {
+                    const response = await fetch('/video_feed', {
                         method: 'POST',
                         body: formData
                     });
@@ -71,7 +70,7 @@
                     }
 
                     const predictions = await response.json();
-                    displayPredictions(predictions);
+                    predictionDiv.textContent = `Predictions: ${predictions.join(', ')}`;
                 } catch (err) {
                     console.error('Error sending or receiving frame:', err);
                 } finally {
@@ -80,19 +79,6 @@
             }
 
             await sendFrame(); // Start sending frames
-        }
-
-        // Function to display predictions on the frontend
-        function displayPredictions(predictions) {
-            predictionsDiv.innerHTML = ''; // Clear previous predictions
-            predictions.forEach(prediction => {
-                const label = prediction.label;
-                const confidence = prediction.confidence.toFixed(4); // Adjust precision as needed
-                const predictionText = `Label: ${label}, Confidence: ${confidence}`;
-                const predictionElement = document.createElement('p');
-                predictionElement.textContent = predictionText;
-                predictionsDiv.appendChild(predictionElement);
-            });
         }
 
         // Initialize the application
