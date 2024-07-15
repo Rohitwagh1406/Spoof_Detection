@@ -121,9 +121,6 @@ def video_feed():
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
     processed_frame = detect_and_predict(img)
-    # label = detect_and_predict(img)
-    _, buffer = cv2.imencode('.jpg', processed_frame)
-    io_buf = BytesIO(buffer)
     del frame
     return jsonify(processed_frame)
 ###
